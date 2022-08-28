@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -76,7 +77,7 @@ public class Generate extends CmdCommon implements BLauncherCmd {
             errStream.println(commandUsageInfo);
             return;
         }
-        errStream.println(System.getProperty("os.name"));
+        //errStream.println(System.getProperty("os.name"));
         try  {
             if (projectEnvironmentBuilder == null) {
                 balProject = ProjectLoader.loadProject(Paths.get(""));
@@ -109,9 +110,10 @@ public class Generate extends CmdCommon implements BLauncherCmd {
         List<Path> fileList = listFiles(dirPath);
         for (Path i : fileList) {
             if (i.toString().endsWith(".bal")) {
-                String[] pathElements = i.toString().strip().split(File.separator, -1);
+                String[] pathElements = i.toString().strip().split(Pattern.quote(File.separator));
+                //String[] pathElements = i.toString().strip().split(File.separator, -1);
                 String module = "";
-                String[] dirElements = this.sourcePath.split(File.separator, -1);
+                String[] dirElements = this.sourcePath.split(Pattern.quote(File.separator));
                 if (!Arrays.asList(dirElements).contains(pathElements[pathElements.length - 2])) {
                     module = pathElements[pathElements.length - 2];
                 }
