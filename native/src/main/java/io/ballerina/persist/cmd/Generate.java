@@ -76,6 +76,7 @@ public class Generate extends CmdCommon implements BLauncherCmd {
             errStream.println(commandUsageInfo);
             return;
         }
+        errStream.println(System.getProperty("os.name"));
         try  {
             if (projectEnvironmentBuilder == null) {
                 balProject = ProjectLoader.loadProject(Paths.get(""));
@@ -109,7 +110,6 @@ public class Generate extends CmdCommon implements BLauncherCmd {
         for (Path i : fileList) {
             if (i.toString().endsWith(".bal")) {
                 String[] pathElements = i.toString().strip().split(File.separator, -1);
-                errStream.println(pathElements);
                 String module = "";
                 String[] dirElements = this.sourcePath.split(File.separator, -1);
                 if (!Arrays.asList(dirElements).contains(pathElements[pathElements.length - 2])) {
