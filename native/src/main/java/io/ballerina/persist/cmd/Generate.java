@@ -109,6 +109,7 @@ public class Generate extends CmdCommon implements BLauncherCmd {
         for (Path i : fileList) {
             if (i.toString().endsWith(".bal")) {
                 errStream.println(i);
+                errStream.println(File.separator);
                 String[] pathElements = i.toString().strip().split(File.separator, -1);
                 String module = "";
                 String[] dirElements = this.sourcePath.split(File.separator, -1);
