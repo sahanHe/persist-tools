@@ -116,6 +116,7 @@ public class Generate extends CmdCommon implements BLauncherCmd {
                     module = pathElements[pathElements.length - 2];
                 }
                 Path filePath = i;
+                errStream.println(i);
                 ArrayList<Entity> retData = BalSyntaxTreeGenerator.readBalFiles(filePath, module);
                 if (retData.size() != 0) {
                     returnMetaData.addAll(retData);

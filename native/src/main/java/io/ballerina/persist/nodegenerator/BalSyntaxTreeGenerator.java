@@ -184,7 +184,6 @@ public class BalSyntaxTreeGenerator {
 
         imports = imports.add(getImportDeclarationNode("ballerina", "sql"));
         imports = imports.add(getImportDeclarationNode("ballerinax", "mysql"));
-        errStream.println(entity.fields);
         for (HashMap i : entity.fields) {
             if (i.get("fieldType").toString().contains("time")) {
                 imports = imports.add(getImportDeclarationNode("ballerina", "time"));
