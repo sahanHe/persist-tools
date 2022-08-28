@@ -129,6 +129,7 @@ public class Generate extends CmdCommon implements BLauncherCmd {
 
     private void generateScripts(Entity entity) throws Exception {
         SyntaxTree balTree = BalSyntaxTreeGenerator.generateBalFile(entity);
+        errStream.println(Formatter.format(balTree));
         if (entity.module.equals("")) {
             writeOutputFile(balTree, Paths.get(this.sourcePath, "modules", "generated_clients",
                     entity.entityName.toLowerCase() + "_client.bal").toAbsolutePath().toString());
