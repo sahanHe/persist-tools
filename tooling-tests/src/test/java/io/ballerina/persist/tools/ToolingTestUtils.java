@@ -78,8 +78,8 @@ public class ToolingTestUtils {
 
     public static void assertGeneratedSources(String subDir, Command cmd) {
         generateSourceCode(Paths.get(GENERATED_SOURCES_DIRECTORY, subDir), cmd);
-        errStream.println(directoryContentEquals(Paths.get(RESOURCES_EXPECTED_OUTPUT.toString()).resolve(subDir),
-                Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir)));
+//        errStream.println(directoryContentEquals(Paths.get(RESOURCES_EXPECTED_OUTPUT.toString()).resolve(subDir),
+//                Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir)));
         Assert.assertTrue(directoryContentEquals(Paths.get(RESOURCES_EXPECTED_OUTPUT.toString()).resolve(subDir),
                 Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir)));
         //Assert.assertFalse(hasSyntacticDiagnostics(Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir)));
@@ -89,7 +89,7 @@ public class ToolingTestUtils {
         for (Path actualOutputFile: listFiles(Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir))) {
             Path expectedOutputFile = Paths.get(RESOURCES_EXPECTED_OUTPUT.toString(), subDir).
                     resolve(actualOutputFile.subpath(3, actualOutputFile.getNameCount()));
-            //errStream.println(Files.exists(actualOutputFile));
+            errStream.println(Files.exists(actualOutputFile));
             //errStream.println(readContent(actualOutputFile).equals(readContent(expectedOutputFile)));
             Assert.assertTrue(Files.exists(actualOutputFile));
             Assert.assertEquals(readContent(actualOutputFile), readContent(expectedOutputFile));
