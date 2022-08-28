@@ -207,8 +207,7 @@ public class ToolingTestUtils {
             }
 
             if (dir1Paths.size() != dir2Paths.size()) {
-                errStream.println(dir1Paths.size());
-                errStream.println(dir2Paths.size());
+                errStream.println(dir2Paths);
                 return false;
             }
 
