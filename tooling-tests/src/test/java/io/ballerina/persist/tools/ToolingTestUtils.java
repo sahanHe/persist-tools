@@ -207,16 +207,14 @@ public class ToolingTestUtils {
             }
 
             if (dir1Paths.size() != dir2Paths.size()) {
-                errStream.println(dir1Paths);
-                errStream.println(dir2Paths);
+                errStream.println("0");
                 return false;
             }
 
             for (Map.Entry<Path, Path> pathEntry : dir1Paths.entrySet()) {
                 Path relativePath = pathEntry.getKey();
                 if (!dir2Paths.containsKey(relativePath)) {
-                    errStream.println(dir2Paths);
-                    errStream.println(relativePath);
+                    errStream.println("1");
                     return false;
                 }
             }
