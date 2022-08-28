@@ -106,7 +106,7 @@ public class Generate extends CmdCommon implements BLauncherCmd {
         ArrayList<Entity> returnMetaData = new ArrayList<>();
         Path dirPath = Paths.get(this.sourcePath);
         List<Path> fileList = listFiles(dirPath);
-
+        errStream.println(fileList);
         for (Path i : fileList) {
             if (i.toString().endsWith(".bal")) {
                 String[] pathElements = i.toString().strip().split(File.separator, -1);
@@ -116,7 +116,6 @@ public class Generate extends CmdCommon implements BLauncherCmd {
                     module = pathElements[pathElements.length - 2];
                 }
                 Path filePath = i;
-                errStream.println(i);
                 ArrayList<Entity> retData = BalSyntaxTreeGenerator.readBalFiles(filePath, module);
                 if (retData.size() != 0) {
                     returnMetaData.addAll(retData);
