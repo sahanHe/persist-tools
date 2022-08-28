@@ -218,6 +218,7 @@ public class ToolingTestUtils {
                     return false;
                 }
             }
+            errStream.println("3");
             return true;
         }
         errStream.println("3");
