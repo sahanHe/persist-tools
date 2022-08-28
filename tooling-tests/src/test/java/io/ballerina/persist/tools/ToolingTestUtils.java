@@ -88,8 +88,8 @@ public class ToolingTestUtils {
         for (Path actualOutputFile: listFiles(Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir))) {
             Path expectedOutputFile = Paths.get(RESOURCES_EXPECTED_OUTPUT.toString(), subDir).
                     resolve(actualOutputFile.subpath(3, actualOutputFile.getNameCount()));
-            errStream.println(Files.exists(actualOutputFile));
-            errStream.println(readContent(actualOutputFile).equals(readContent(expectedOutputFile)));
+            //errStream.println(Files.exists(actualOutputFile));
+            //errStream.println(readContent(actualOutputFile).equals(readContent(expectedOutputFile)));
             Assert.assertTrue(Files.exists(actualOutputFile));
             Assert.assertEquals(readContent(actualOutputFile), readContent(expectedOutputFile));
         }
