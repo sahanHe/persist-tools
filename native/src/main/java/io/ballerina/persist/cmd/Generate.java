@@ -106,9 +106,9 @@ public class Generate extends CmdCommon implements BLauncherCmd {
         ArrayList<Entity> returnMetaData = new ArrayList<>();
         Path dirPath = Paths.get(this.sourcePath);
         List<Path> fileList = listFiles(dirPath);
-        errStream.println(fileList);
         for (Path i : fileList) {
             if (i.toString().endsWith(".bal")) {
+                errStream.println(i);
                 String[] pathElements = i.toString().strip().split(File.separator, -1);
                 String module = "";
                 String[] dirElements = this.sourcePath.split(File.separator, -1);
