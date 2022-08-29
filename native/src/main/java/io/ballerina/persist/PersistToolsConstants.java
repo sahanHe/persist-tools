@@ -40,5 +40,7 @@ public class PersistToolsConstants {
     public static final String KEY_HOST = "host";
 
     public static final String CONFIG_PATH = "Config.toml";
+    public static final char QUOTE = '"';
+
 
 }
