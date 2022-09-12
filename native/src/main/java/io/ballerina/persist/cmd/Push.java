@@ -18,12 +18,19 @@
 package io.ballerina.persist.cmd;
 
 import io.ballerina.cli.BLauncherCmd;
+import io.ballerina.cli.utils.BuildTime;
 import io.ballerina.persist.nodegenerator.SyntaxTreeGenerator;
 import io.ballerina.persist.objects.BalException;
+import io.ballerina.projects.JBallerinaBackend;
+import io.ballerina.projects.JvmTarget;
+import io.ballerina.projects.PackageCompilation;
 import io.ballerina.projects.Project;
 import io.ballerina.projects.ProjectEnvironmentBuilder;
 import io.ballerina.projects.ProjectException;
+import io.ballerina.projects.ProjectKind;
+import io.ballerina.projects.directory.BuildProject;
 import io.ballerina.projects.directory.ProjectLoader;
+import io.ballerina.projects.internal.model.Target;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -31,6 +38,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -40,7 +48,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
+import static io.ballerina.cli.utils.FileUtils.getFileNameWithoutExtension;
 import static io.ballerina.persist.PersistToolsConstants.COMPONENT_IDENTIFIER;
+import static org.wso2.ballerinalang.compiler.util.ProjectDirConstants.BLANG_COMPILED_JAR_EXT;
 
 /**
  * Class to implement "persist push" command for ballerina.
@@ -84,6 +94,60 @@ public class Push implements BLauncherCmd {
                     .descriptor().name().value();
         } catch (ProjectException e) {
             errStream.println("The current directory is not a Ballerina project!");
+            return;
+        }
+        Target target = null;
+        try {
+            if (projectEnvironmentBuilder == null) {
+                balProject = BuildProject.load(Paths.get("").toAbsolutePath());
+
+            } else {
+                balProject = BuildProject.load(projectEnvironmentBuilder, Paths.get(sourcePath).toAbsolutePath());
+            }
+            if (balProject.kind().equals(ProjectKind.BUILD_PROJECT)) {
+                target = new Target(balProject.targetDir());
+            } else {
+                target = new Target(Files.createTempDirectory("ballerina-cache" + System.nanoTime()));
+                target.setOutputPath(getExecutablePath(balProject));
+            }
+        } catch (IOException e) {
+            errStream.println(e.getMessage());
+            return;
+        } catch (ProjectException e) {
+            errStream.println(e.getMessage());
+            return;
+        }
+
+        Path executablePath;
+        try {
+            executablePath = target.getExecutablePath(balProject.currentPackage()).toAbsolutePath().normalize();
+        } catch (IOException e) {
+            errStream.println(e.getMessage());
+            return;
+        }
+
+        try {
+            PackageCompilation pkgCompilation = balProject.currentPackage().getCompilation();
+            JBallerinaBackend jBallerinaBackend = JBallerinaBackend.from(pkgCompilation, JvmTarget.JAVA_11);
+            long start = 0;
+            if (balProject.buildOptions().dumpBuildTime()) {
+                start = System.currentTimeMillis();
+            }
+            jBallerinaBackend.emit(JBallerinaBackend.OutputType.EXEC, executablePath);
+            if (balProject.buildOptions().dumpBuildTime()) {
+                BuildTime.getInstance().emitArtifactDuration = System.currentTimeMillis() - start;
+                BuildTime.getInstance().compile = false;
+            }
+
+            // Print warnings for conflicted jars
+            if (!jBallerinaBackend.conflictedJars().isEmpty()) {
+                errStream.println("\twarning: Detected conflicting jar files:");
+                for (JBallerinaBackend.JarConflict conflict : jBallerinaBackend.conflictedJars()) {
+                    errStream.println(conflict.getWarning(balProject.buildOptions().listConflictedClasses()));
+                }
+            }
+        } catch (ProjectException e) {
+            errStream.println(e.getMessage());
             return;
         }
         String sValue = new String();
@@ -152,6 +216,15 @@ public class Push implements BLauncherCmd {
             errStream.println("*** ");
             return;
         }
+
+    }
+
+    private Path getExecutablePath(Project project) {
+
+        Path fileName = project.sourceRoot().getFileName();
+        Path currentDir = Paths.get(this.sourcePath);
+        // If the --output flag is not set, create the executable in the current directory
+        return currentDir.resolve(getFileNameWithoutExtension(fileName) + BLANG_COMPILED_JAR_EXT);
 
     }
 
