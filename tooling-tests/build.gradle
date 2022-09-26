@@ -86,26 +86,25 @@ def checkTestDockerContainerStatus(dockerName) {
     }
 }
 
-task startTestDockerContainer() {
+task startTestDockerContainer(type: Exec) {
     if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-        exec {
-            def standardOutput = new ByteArrayOutputStream()
-            commandLine 'sh', '-c', 'docker run --rm -d --name ballerina-persist-tools -e MYSQL_ROOT_PASSWORD="Test123#" -p 3307:3306 -t mysql:8.0.21'
-            def healthCheck = 1
-            def counter = 0
-            doLast {
-                checkExecResult(execResult, 'Error', standardOutput)
-                while (healthCheck != 0 && counter < 12) {
-                    sleep(60 * 1000)
-                    healthCheck = checkTestDockerContainerStatus('ballerina-persist-tools')
-                    counter = counter + 1
-                }
-                if (healthCheck != 0) {
-                    throw new GradleException("Docker container 'ballerina-mysql' health test exceeded timeout!")
-                }
+        def standardOutput = new ByteArrayOutputStream()
+        commandLine 'sh', '-c', 'docker run --rm -d --name ballerina-persist-tools -e MYSQL_ROOT_PASSWORD="Test123#" -p 3307:3306 -t mysql:8.0.21'
+        def healthCheck = 1
+        def counter = 0
+        doLast {
+            checkExecResult(execResult, 'Error', standardOutput)
+            while (healthCheck != 0 && counter < 12) {
+                sleep(60 * 1000)
+                healthCheck = checkTestDockerContainerStatus('ballerina-persist-tools')
+                counter = counter + 1
+            }
+            if (healthCheck != 0) {
+                throw new GradleException("Docker container 'ballerina-mysql' health test exceeded timeout!")
             }
         }
     } else {
+        commandLine 'slmgr /dlv'
         println('\n' + "Windows Instance detected")
         println('\n' + "skippped starting the docker container")
     }
