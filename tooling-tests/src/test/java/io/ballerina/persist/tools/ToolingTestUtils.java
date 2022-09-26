@@ -25,7 +25,6 @@ import io.ballerina.persist.cmd.Push;
 import io.ballerina.projects.ProjectEnvironmentBuilder;
 import io.ballerina.projects.environment.Environment;
 import io.ballerina.projects.environment.EnvironmentBuilder;
-import org.junit.platform.commons.util.StringUtils;
 import org.testng.Assert;
 
 import java.io.File;
