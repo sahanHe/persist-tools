@@ -25,6 +25,7 @@ import io.ballerina.persist.cmd.Push;
 import io.ballerina.projects.ProjectEnvironmentBuilder;
 import io.ballerina.projects.environment.Environment;
 import io.ballerina.projects.environment.EnvironmentBuilder;
+import org.junit.platform.commons.util.StringUtils;
 import org.testng.Assert;
 
 import java.io.File;
@@ -98,7 +99,8 @@ public class ToolingTestUtils {
                     resolve(actualOutputFile.subpath(3, actualOutputFile.getNameCount()));
             if (actualOutputFile.toString().contains(".sql")) {
                 errStream.println(readContent(actualOutputFile));
-                readContent(expectedOutputFile);
+                errStream.println(readContent(expectedOutputFile));
+
             }
             if (actualOutputFile.toString().contains("persist_db_scripts.sql")
                     && subDir.equals("tool_test_generate_7")) {
