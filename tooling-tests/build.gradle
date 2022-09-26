@@ -104,7 +104,7 @@ task startTestDockerContainer(type: Exec) {
             }
         }
     } else {
-        commandLine 'slmgr /dlv'
+        commandLine 'cmd','slmgr /dlv'
         println('\n' + "Windows Instance detected")
         println('\n' + "skippped starting the docker container")
     }
