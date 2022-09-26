@@ -96,7 +96,7 @@ public class ToolingTestUtils {
             errStream.println(actualOutputFile.toString());
             Path expectedOutputFile = Paths.get(RESOURCES_EXPECTED_OUTPUT.toString(), subDir).
                     resolve(actualOutputFile.subpath(3, actualOutputFile.getNameCount()));
-            if(actualOutputFile.toString().contains(".sql")) {
+            if (actualOutputFile.toString().contains(".sql")) {
                 errStream.println(readContent(actualOutputFile));
                 readContent(expectedOutputFile);
             }
