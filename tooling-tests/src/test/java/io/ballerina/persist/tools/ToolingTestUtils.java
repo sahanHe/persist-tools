@@ -324,6 +324,10 @@ public class ToolingTestUtils {
             errStream.println(e.getMessage());
             return "";
         }
-        return content.replaceAll(System.lineSeparator(), "");
+        String osName = System.getProperty("os.name");
+        if (!osName.toLowerCase().contains("windows")) {
+            return content.replaceAll("\n", "");
+        }
+        return content.replaceAll("\n", "");
     }
 }
