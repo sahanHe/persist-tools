@@ -94,12 +94,17 @@ public class ToolingTestUtils {
 
         for (Path actualOutputFile: listFiles(Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir))) {
             errStream.println(actualOutputFile.toString());
+            Path expectedOutputFile = Paths.get(RESOURCES_EXPECTED_OUTPUT.toString(), subDir).
+                    resolve(actualOutputFile.subpath(3, actualOutputFile.getNameCount()));
+            if(actualOutputFile.toString().contains(".sql")) {
+                errStream.println(readContent(actualOutputFile));
+                readContent(expectedOutputFile);
+            }
             if (actualOutputFile.toString().contains("persist_db_scripts.sql")
                     && subDir.equals("tool_test_generate_7")) {
                 continue;
             }
-            Path expectedOutputFile = Paths.get(RESOURCES_EXPECTED_OUTPUT.toString(), subDir).
-                    resolve(actualOutputFile.subpath(3, actualOutputFile.getNameCount()));
+
             errStream.println(5);
             Assert.assertTrue(Files.exists(actualOutputFile));
             errStream.println(6);
