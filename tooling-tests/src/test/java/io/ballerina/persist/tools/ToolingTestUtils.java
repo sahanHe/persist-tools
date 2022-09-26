@@ -76,15 +76,20 @@ public class ToolingTestUtils {
     }
 
     public static void assertGeneratedSources(String subDir, Command cmd) {
-
+        errStream.println(0);
         generateSourceCode(Paths.get(GENERATED_SOURCES_DIRECTORY, subDir), cmd);
+        errStream.println(1);
         Assert.assertTrue(directoryContentEquals(Paths.get(RESOURCES_EXPECTED_OUTPUT.toString()).resolve(subDir),
                 Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir)));
+        errStream.println(2);
 
         if (!subDir.equals("tool_test_generate_4")) {
+
             Assert.assertFalse(hasSyntacticDiagnostics(Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir)));
+            errStream.println(3);
             Assert.assertFalse(hasSemanticDiagnostics(Paths.get(GENERATED_SOURCES_DIRECTORY)
                     .resolve(subDir), getEnvironmentBuilder()));
+            errStream.println(4);
         }
 
         for (Path actualOutputFile: listFiles(Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir))) {
