@@ -93,6 +93,7 @@ public class ToolingTestUtils {
         }
 
         for (Path actualOutputFile: listFiles(Paths.get(GENERATED_SOURCES_DIRECTORY).resolve(subDir))) {
+            errStream.println(actualOutputFile.toString());
             if (actualOutputFile.toString().contains("persist_db_scripts.sql")
                     && subDir.equals("tool_test_generate_7")) {
                 continue;
