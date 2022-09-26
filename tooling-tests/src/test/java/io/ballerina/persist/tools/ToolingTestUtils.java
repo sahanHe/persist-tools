@@ -99,8 +99,11 @@ public class ToolingTestUtils {
             }
             Path expectedOutputFile = Paths.get(RESOURCES_EXPECTED_OUTPUT.toString(), subDir).
                     resolve(actualOutputFile.subpath(3, actualOutputFile.getNameCount()));
+            errStream.println(5);
             Assert.assertTrue(Files.exists(actualOutputFile));
+            errStream.println(6);
             Assert.assertEquals(readContent(actualOutputFile), readContent(expectedOutputFile));
+            errStream.println(7);
         }
     }
 
