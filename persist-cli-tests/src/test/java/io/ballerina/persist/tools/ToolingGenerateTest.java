@@ -108,14 +108,14 @@ public class ToolingGenerateTest {
         assertGeneratedSources("tool_test_generate_13", GENERATE);
     }
 
-    @Test()
+    @Test(enabled = false)
     @Description("There are three entities with one to one associations between each other with one parent entity " +
             "in sub module")
     public void testGenerateThreeEntitiesWith1To1AssociationsWithEntityInSubModule() {
         assertGeneratedSources("tool_test_generate_14", GENERATE);
     }
 
-    @Test()
+    @Test(enabled = false)
     @Description("There are three entities with one to one associations between each other with one child entity " +
             "in sub module")
     public void testGenerateThreeEntitiesWith1To1AssociationsWithChildEntityInSubModule() {

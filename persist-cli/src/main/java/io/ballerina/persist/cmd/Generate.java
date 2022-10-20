@@ -193,7 +193,7 @@ public class Generate implements BLauncherCmd {
                     }
                 }
                 generateRelations(returnMetaData);
-                returnModuleMembers = formatModuleMembers(returnModuleMembers, returnMetaData);
+                formatModuleMembers(returnModuleMembers, returnMetaData);
                 return new EntityMetaData(returnMetaData, returnModuleMembers);
             }
 
