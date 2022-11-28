@@ -61,11 +61,11 @@ public class Init implements BLauncherCmd {
 
     private final PrintStream errStream = System.err;
     private final PrintStream outStream = System.out;
-    private final String configPath = PersistToolsConstants.CONFIG_SCRIPT_FILE;
+    private static final String configPath = PersistToolsConstants.CONFIG_SCRIPT_FILE;
 
-    private String configName = "";
-    private String projectName = "";
-    public String sourcePath = "";
+    private static String configName = "";
+    private static String projectName = "";
+    public static String sourcePath = "";
     private static final String COMMAND_IDENTIFIER = "persist-init";
 
 
@@ -144,9 +144,11 @@ public class Init implements BLauncherCmd {
     private void generateConfigurationBalFile() throws BalException {
         try {
             String configTree = BalSyntaxTreeGenerator.generateDatabaseConfigSyntaxTree();
-            writeOutputString(configTree, Paths.get(this.sourcePath, BalFileConstants.KEYWORD_MODULES,
-                            BalFileConstants.KEYWORD_CLIENTS, PATH_CONFIGURATION_BAL_FILE)
-                    .toAbsolutePath().toString());
+            if (configTree != null) {
+                writeOutputString(configTree, Paths.get(this.sourcePath, BalFileConstants.KEYWORD_MODULES,
+                                BalFileConstants.KEYWORD_CLIENTS, PATH_CONFIGURATION_BAL_FILE)
+                        .toAbsolutePath().toString());
+            }
         } catch (Exception e) {
             throw new BalException("Error while adding database_configuration.bal file inside the client sub module. " +
                     e.getMessage());

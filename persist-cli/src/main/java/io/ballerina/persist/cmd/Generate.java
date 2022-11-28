@@ -27,7 +27,6 @@ import io.ballerina.persist.objects.BalException;
 import io.ballerina.persist.objects.Entity;
 import io.ballerina.persist.objects.EntityMetaData;
 import io.ballerina.projects.DiagnosticResult;
-import io.ballerina.projects.Project;
 import io.ballerina.projects.ProjectException;
 import io.ballerina.projects.directory.ProjectLoader;
 import io.ballerina.tools.diagnostics.Diagnostic;
@@ -45,6 +44,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,10 +79,6 @@ public class Generate implements BLauncherCmd {
 
     private static final String COMMAND_IDENTIFIER = "persist-generate";
 
-    Project balProject;
-
-    String name;
-
     public Generate() {}
 
     @CommandLine.Option(names = {"-h", "--help"}, hidden = true)
@@ -103,9 +99,7 @@ public class Generate implements BLauncherCmd {
             return;
         }
         try  {
-            balProject = ProjectLoader.loadProject(Paths.get(this.sourcePath));
-            name = balProject.currentPackage().descriptor().org().value() + "." + balProject.currentPackage()
-                    .descriptor().name().value();
+            ProjectLoader.loadProject(Paths.get(this.sourcePath));
         } catch (ProjectException e) {
             errStream.println("Not a Ballerina project (or any parent up to mount point)\n" +
                     "You should run this command inside a Ballerina project. ");
@@ -118,8 +112,6 @@ public class Generate implements BLauncherCmd {
             ArrayList<ImportDeclarationNode> imports = new ArrayList<>();
             if (entityArray.size() != 0) {
                 for (Entity entity : entityArray) {
-                    entity.setPackageName(balProject.currentPackage().descriptor().org().value() + "/"
-                            + balProject.currentPackage().descriptor().name().value());
                     generateClientBalFile(entity, imports);
                     outStream.printf("Generated Ballerina client file for entity %s, " +
                             "inside clients sub module.%n", entity.getEntityName());
@@ -190,7 +182,6 @@ public class Generate implements BLauncherCmd {
                 returnModuleMembers = formatModuleMembers(returnModuleMembers, returnMetaData);
                 return new EntityMetaData(returnMetaData, returnModuleMembers);
             }
-
         } catch (IOException e) {
             throw new BalException("Error while reading entities in the Ballerina project. " + e.getMessage());
         }
@@ -200,7 +191,8 @@ public class Generate implements BLauncherCmd {
     private void generateClientBalFile(Entity entity, ArrayList<ImportDeclarationNode> imports) throws BalException {
         SyntaxTree balTree = BalSyntaxTreeGenerator.generateClientSyntaxTree(entity, imports);
         String clientPath = Paths.get(this.sourcePath, KEYWORD_MODULES, KEYWORD_CLIENTS,
-                    entity.getEntityName().toLowerCase() + "_client.bal").toAbsolutePath().toString();
+                    entity.getEntityName().toLowerCase(Locale.getDefault())
+                            + "_client.bal").toAbsolutePath().toString();
         try {
             writeOutputFile(balTree, clientPath);
         } catch (IOException | FormatterException e) {

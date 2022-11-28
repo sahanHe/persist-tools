@@ -66,6 +66,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static io.ballerina.persist.nodegenerator.BalFileConstants.ANYDATASTREAM_IS_STREAM_TYPE;
@@ -642,7 +643,7 @@ public class BalSyntaxTreeGenerator {
                 keyStringExist.append(String.format(key));
                 keyStringExist.append(COLON);
                 keyStringExist.append(SPACE);
-                keyStringExist.append(entity.getEntityName().substring(0, 1).toLowerCase());
+                keyStringExist.append(entity.getEntityName().substring(0, 1).toLowerCase(Locale.getDefault()));
                 keyStringExist.append(entity.getEntityName().substring(1));
                 keyStringExist.append(FIELD_ACCESSS);
                 keyStringExist.append(key);
@@ -651,7 +652,7 @@ public class BalSyntaxTreeGenerator {
 
         } else {
             keyStringExist = new StringBuilder();
-            keyStringExist.append(entity.getEntityName().substring(0, 1).toLowerCase());
+            keyStringExist.append(entity.getEntityName().substring(0, 1).toLowerCase(Locale.getDefault()));
             keyStringExist.append(entity.getEntityName().substring(1));
             keyStringExist.append(FIELD_ACCESSS);
             for (String key : keys.keySet()) {
@@ -829,16 +830,18 @@ public class BalSyntaxTreeGenerator {
                 IfElse valueCheck = new IfElse(NodeParser.parseExpression(String.format(VALUE_TYPE_CHECK,
                         relation.getRelatedInstance(), relation.getRelatedType())));
                 valueCheck.addIfStatement(NodeParser.parseStatement(String.format(GET_NEW_CLIENT,
-                        relation.getRelatedType(), relation.getRelatedType().substring(0, 1).toLowerCase() +
+                        relation.getRelatedType(), relation.getRelatedType().substring(0, 1)
+                                .toLowerCase(Locale.getDefault()) +
                                 relation.getRelatedType().substring(1), relation.getRelatedType())));
                 valueCheck.addIfStatement(NodeParser.parseStatement(String.format(CHECK_EXISTENCE,
-                        relation.getRelatedType().substring(0, 1).toLowerCase() +
+                        relation.getRelatedType().substring(0, 1).toLowerCase(Locale.getDefault()) +
                                 relation.getRelatedType().substring(1),
                         relation.getRelatedType(), relation.getRelatedInstance())));
                 IfElse checkExistence = new IfElse(NodeParser.parseExpression(NOT_EXIST));
                 checkExistence.addIfStatement(NodeParser.parseStatement(String.format(CREATE_CLIENT,
-                        relation.getRelatedInstance(), relation.getRelatedType().substring(0, 1).toLowerCase()
-                                + relation.getRelatedType().substring(1), relation.getRelatedType(),
+                        relation.getRelatedInstance(), relation.getRelatedType().substring(0, 1)
+                                .toLowerCase(Locale.getDefault()) + relation.getRelatedType().substring(1),
+                        relation.getRelatedType(),
                         relation.getRelatedInstance())));
                 valueCheck.addIfStatement(checkExistence.getIfElseStatementNode());
                 create.addIfElseStatement(valueCheck.getIfElseStatementNode());
@@ -946,19 +949,22 @@ public class BalSyntaxTreeGenerator {
                         relation.getRelatedInstance())));
                 typeCheck.addIfStatement(NodeParser.parseStatement(String.format(GET_ENTITY_RECORD,
                         relation.getRelatedType(), relation.getRelatedType().substring(0, 1)
-                                .toLowerCase() + relation.getRelatedType().substring(1), relation.getRelatedType(),
+                                .toLowerCase(Locale.getDefault()) + relation.getRelatedType().substring(1),
+                        relation.getRelatedType(),
                         relation.getRelatedInstance())));
                 typeCheck.addIfStatement(NodeParser.parseStatement(String.format(GET_ENTITY_CLIENT,
                         relation.getRelatedType(), relation.getRelatedType().substring(0, 1)
-                                .toLowerCase() + relation.getRelatedType().substring(1), relation.getRelatedType())));
+                                .toLowerCase(Locale.getDefault()) + relation.getRelatedType().substring(1),
+                        relation.getRelatedType())));
                 typeCheck.addIfStatement(NodeFactory.createExpressionStatementNode(SyntaxKind.ACTION_STATEMENT,
                         NodeFactory.createCheckExpressionNode(
                                 SyntaxKind.CHECK_ACTION,
                                 SyntaxTreeConstants.SYNTAX_TREE_KEYWORD_CHECK,
                                 NodeParser.parseActionOrExpression(String.format(CHECK_UPDATE_STATEMENT,
                                         relation.getRelatedType().substring(0, 1)
-                                                .toLowerCase() + relation.getRelatedType().substring(1),
-                                        relation.getRelatedType().substring(0, 1).toLowerCase() +
+                                                .toLowerCase(Locale.getDefault()) +
+                                                relation.getRelatedType().substring(1),
+                                        relation.getRelatedType().substring(0, 1).toLowerCase(Locale.getDefault()) +
                                                 relation.getRelatedType().substring(1)
                                 ))
                         ), SYNTAX_TREE_SEMICOLON));
@@ -981,7 +987,8 @@ public class BalSyntaxTreeGenerator {
     private static Function getExistMethod(Entity entity, StringBuilder keyString) {
         Function exists = new Function(BalFileConstants.EXISTS);
         exists.addRequiredParameter(TypeDescriptor.getSimpleNameReferenceNode(entity.getEntityName()),
-                entity.getEntityName().substring(0, 1).toLowerCase() + entity.getEntityName().substring(1));
+                entity.getEntityName().substring(0, 1).toLowerCase(Locale.getDefault()) +
+                        entity.getEntityName().substring(1));
         exists.addQualifiers(new String[]{BalFileConstants.KEYWORD_REMOTE});
         exists.addReturns(TypeDescriptor.getUnionTypeDescriptorNode(
                 TypeDescriptor.getBuiltinSimpleNameReferenceNode(KEYWORD_BOOLEAN),
@@ -1096,16 +1103,19 @@ public class BalSyntaxTreeGenerator {
                                 for (String key : childEntity.getKeys()) {
                                     String modifiedKey = key.replace(DOUBLE_QUOTE, EMPTY_STRING).trim();
                                     relation.getKeyColumns().add(
-                                            childEntity.getEntityName().toLowerCase() + modifiedKey.substring(0, 1)
-                                                    .toUpperCase() + modifiedKey.substring(1));
+                                            childEntity.getEntityName().toLowerCase(Locale.getDefault())
+                                                    + modifiedKey.substring(0, 1).toUpperCase(Locale.getDefault()) +
+                                                    modifiedKey.substring(1));
                                     relation.getReferences().add(modifiedKey);
                                 }
                             } else if (relation.getKeyColumns().isEmpty()) {
                                 for (String key : childEntity.getKeys()) {
                                     String modifiedKey = key.replace(DOUBLE_QUOTE, EMPTY_STRING).trim();
                                     relation.getKeyColumns().add(
-                                            childEntity.getEntityName().toLowerCase() + modifiedKey.substring(0, 1)
-                                                    .toUpperCase() + modifiedKey.substring(1));
+                                            childEntity.getEntityName().toLowerCase(Locale.getDefault())
+                                                    + modifiedKey.substring(0, 1)
+                                                    .toUpperCase(Locale.getDefault())
+                                                    + modifiedKey.substring(1));
                                 }
                             } else if (relation.getReferences().isEmpty()) {
                                 for (String key : childEntity.getKeys()) {
@@ -1201,16 +1211,18 @@ public class BalSyntaxTreeGenerator {
                                 for (String key : entity.getKeys()) {
                                     String modifiedKey = key.replace(DOUBLE_QUOTE, EMPTY_STRING).trim();
                                     childEntity.getRelations().get(relationIndex).getKeyColumns().add(
-                                            entity.getEntityName().toLowerCase() + modifiedKey.substring(0, 1)
-                                                    .toUpperCase() + modifiedKey.substring(1));
+                                            entity.getEntityName().toLowerCase(Locale.getDefault())
+                                                    + modifiedKey.substring(0, 1)
+                                                    .toUpperCase(Locale.getDefault()) + modifiedKey.substring(1));
                                     childEntity.getRelations().get(relationIndex).getReferences().add(modifiedKey);
                                 }
                             } else if (childEntity.getRelations().get(relationIndex).getKeyColumns().isEmpty()) {
                                 for (String key : entity.getKeys()) {
                                     String modifiedKey = key.replace(DOUBLE_QUOTE, EMPTY_STRING).trim();
                                     childEntity.getRelations().get(relationIndex).getKeyColumns().add(
-                                            entity.getEntityName().toLowerCase() + modifiedKey.substring(0, 1)
-                                                    .toUpperCase() + modifiedKey.substring(1));
+                                            entity.getEntityName().toLowerCase(Locale.getDefault())
+                                                    + modifiedKey.substring(0, 1)
+                                                    .toUpperCase(Locale.getDefault()) + modifiedKey.substring(1));
                                 }
                             } else if (childEntity.getRelations().get(relationIndex).getReferences().isEmpty()) {
                                 for (String key : entity.getKeys()) {

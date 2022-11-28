@@ -25,28 +25,31 @@ import io.ballerina.projects.Project;
 import io.ballerina.projects.ProjectException;
 import io.ballerina.projects.directory.BuildProject;
 import io.ballerina.projects.directory.ProjectLoader;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Properties;
 
 import static io.ballerina.persist.PersistToolsConstants.COMPONENT_IDENTIFIER;
 import static io.ballerina.persist.PersistToolsConstants.CONFIG_SCRIPT_FILE;
-import static io.ballerina.persist.PersistToolsConstants.CREATE_DATABASE_SQL;
 import static io.ballerina.persist.PersistToolsConstants.DATABASE;
 import static io.ballerina.persist.PersistToolsConstants.HOST;
 import static io.ballerina.persist.PersistToolsConstants.MYSQL;
@@ -89,7 +92,6 @@ public class Push implements BLauncherCmd {
         String name;
         configurations = new HashMap<>();
         String[] sqlLines;
-        Statement statement;
 
         if (helpFlag) {
             String commandUsageInfo = BLauncherCmd.getCommandUsageInfo(COMMAND_IDENTIFIER);
@@ -106,7 +108,6 @@ public class Push implements BLauncherCmd {
             balProject = BuildProject.load(Paths.get(sourcePath).toAbsolutePath());
             balProject.currentPackage().getCompilation();
             configurations = SyntaxTreeGenerator.readToml(Paths.get(this.sourcePath, this.configPath), name);
-            sqlLines = readSqlFile();
         } catch (ProjectException | BalException  e) {
             errStream.println(e.getMessage());
             return;
@@ -130,9 +131,12 @@ public class Push implements BLauncherCmd {
                 }
             }
             if (!databaseExists) {
-                statement = connection.createStatement();
-                String query = String.format(CREATE_DATABASE_SQL, database);
-                statement.executeUpdate(query);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("CREATE DATABASE ");
+                stringBuilder.append(database);
+                try (PreparedStatement preparedStatement = connection.prepareStatement(stringBuilder.toString())) {
+                    preparedStatement.executeUpdate();
+                }
                 stdStream.println("Created Database. " + database);
             }
         } catch (SQLException e) {
@@ -145,14 +149,21 @@ public class Push implements BLauncherCmd {
                     configurations.get(DATABASE).replaceAll("\"", ""));
 
         try (Connection connection = driver.connect(databaseUrl, props)) {
-            statement = connection.createStatement();
-            for (String sqlLine : sqlLines) {
-                if (!sqlLine.trim().equals("")) {
-                    statement.executeUpdate(sqlLine);
-                }
+            ScriptRunner sr = new ScriptRunner(connection);
+            try (Reader fileReader = new BufferedReader(new FileReader(Paths.get(this.sourcePath,
+                    TARGET_DIR, SQL_SCRIPT_FILE).toAbsolutePath().toString(), StandardCharsets.UTF_8))) {
+                sr.runScript(fileReader);
             }
-            statement.close();
+
         } catch (SQLException e) {
+            errStream.println(String.format("Error while creating the tables in the database %s ", database)
+                    + e.getMessage());
+            return;
+        } catch (FileNotFoundException e) {
+            errStream.println(String.format("Error while creating the tables in the database %s ", database)
+                    + e.getMessage());
+            return;
+        } catch (IOException e) {
             errStream.println(String.format("Error while creating the tables in the database %s ", database)
                     + e.getMessage());
             return;
@@ -193,24 +204,6 @@ public class Push implements BLauncherCmd {
                     + e.getMessage());
         } catch (MalformedURLException e) {
             throw new BalException("Error in jdbc driver path : " + e.getMessage());
-        }
-    }
-    private String[] readSqlFile() throws BalException {
-        String[] sqlLines;
-        String sValue;
-        StringBuilder stringBuilder = new StringBuilder();
-        try (FileReader fileReader = new FileReader(Paths.get(this.sourcePath, TARGET_DIR, SQL_SCRIPT_FILE).
-                toAbsolutePath().toString())) {
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while ((sValue = bufferedReader.readLine()) != null) {
-                stringBuilder.append(sValue);
-            }
-            bufferedReader.close();
-            sqlLines = stringBuilder.toString().split(";");
-            return sqlLines;
-        } catch (IOException e) {
-            throw new BalException("Error while reading the SQL script file (persist_db_push.sql) " +
-                    "generated in the project target directory. ");
         }
     }
 

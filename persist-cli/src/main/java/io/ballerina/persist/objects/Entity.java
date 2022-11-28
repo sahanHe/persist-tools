@@ -30,8 +30,6 @@ public class Entity {
 
     private String entityName;
 
-    private String packageName;
-
     private ArrayList<Relation> relations = new ArrayList<>();
 
     private final ArrayList<FieldMetaData> fields = new ArrayList<>();
@@ -53,10 +51,6 @@ public class Entity {
     }
     public void setTableName(String tableName) {
         this.tableName = tableName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
     }
 
     public String getEntityName() {
