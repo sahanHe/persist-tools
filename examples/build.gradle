@@ -128,6 +128,7 @@ task generateExamples {
                     if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
                         commandLine 'sh', '-c', "${ballerinaDist}/bin/bal persist generate"
                     } else {
+                        commandLine 'cmd','slmgr /dlv'
                         println('\n' + "Windows Instance detected")
                     }
                 }
@@ -150,6 +151,7 @@ def checkTestDockerContainerStatus(dockerName) {
             return 1
         }
     } else {
+        commandLine 'cmd','slmgr /dlv'
         println('\n' + "Windows Instance detected")
     }
 }
@@ -217,6 +219,7 @@ task pushExamples {
                     if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
                         commandLine 'sh', '-c', "${ballerinaDist}/bin/bal persist push"
                     } else {
+                        commandLine 'cmd','slmgr /dlv'
                         println('\n' + "Windows Instance detected")
                     }
                 }
@@ -237,6 +240,7 @@ task testExamples {
                     if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
                         commandLine 'sh', '-c', "${ballerinaDist}/bin/bal run --offline"
                     } else {
+                        commandLine 'cmd','slmgr /dlv'
                         println('\n' + "Windows Instance detected")
                     }
                 }
