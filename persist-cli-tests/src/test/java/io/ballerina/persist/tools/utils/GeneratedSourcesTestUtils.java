@@ -74,8 +74,11 @@ public class GeneratedSourcesTestUtils {
             }
             Path expectedOutputFile = Paths.get(RESOURCES_EXPECTED_OUTPUT.toString(), subDir).
                     resolve(actualOutputFile.subpath(3, actualOutputFile.getNameCount()));
+            errStream.println("1");
             Assert.assertTrue(Files.exists(actualOutputFile));
+            errStream.println("2");
             Assert.assertEquals(readContent(actualOutputFile), readContent(expectedOutputFile));
+            errStream.println("3");
         }
         if (!(subDir.equals("tool_test_generate_4") || subDir.equals("tool_test_generate_26") ||
                 subDir.equals("tool_test_generate_18"))) {
@@ -84,7 +87,9 @@ public class GeneratedSourcesTestUtils {
                     .toAbsolutePath());
             Package currentPackage = buildProject.currentPackage();
             PackageCompilation compilation = currentPackage.getCompilation();
+            errStream.println("4");
             Assert.assertFalse(compilation.diagnosticResult().hasErrors());
+            errStream.println("5");
         }
     }
 
